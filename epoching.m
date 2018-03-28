@@ -14,7 +14,7 @@ function [Epoch] = epoching(session,eventID,time_window)
     
     Dur = unique(tstop-tstart) + 1;
     NumTrials = length(tstart);
-    NumCh = size(session.DATA,1)-1;
+    NumCh = 16;
     
     Data = zeros(NumTrials, NumCh, Dur);
     T = zeros(NumTrials,Dur);
