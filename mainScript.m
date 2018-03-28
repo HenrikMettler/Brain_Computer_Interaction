@@ -16,7 +16,7 @@ switch testPerson
     case 'Simona'
         filename = 'ak1_run1_offlineMIterm_20181403160843.gdf';
     case 'Henrik'
-        error ('Not available yet')
+        filename = 'ak2_run1_offlineMIterm_20182103133044.gdf';
 end
 
 
