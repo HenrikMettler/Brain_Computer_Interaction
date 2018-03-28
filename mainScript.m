@@ -1,7 +1,6 @@
 %% add paths and load channel location and laplacian matrix
 addpath(genpath('biosig')) %genpath to add all the subfolders
 addpath(genpath('data'))
-addpath(genpath('eeglab_current'))
 
 load('channel_location_16_10-20_mi.mat')
 load('laplacian_16_10-20_mi.mat')
@@ -62,30 +61,51 @@ session.DATA_laplacien = session_data_laplacian;
 %% Create structure session_epoching 
 eventID = 200; %Baseline, fixation cross
 time_window = [0,3];
-[Epoch200] = epoching(session, eventID, time_window); %Calling the function epoching
+[epochBaseline] = epoching(session, eventID, time_window); %Calling the function epoching
 
 eventID = 400; %Motor imagery 
 time_window = [0,3]; 
-[Epoch400] = epoching(session, eventID, time_window); 
+[epochMotorImagery] = epoching(session, eventID, time_window); 
 
 eventID = 555; %Stop
 time_window = [-2,4];
-[Epoch555] = epoching(session, eventID, time_window);
+[epochStop] = epoching(session, eventID, time_window);
 
 %% Power spectral density estimate
-% WelchPower(session.SR, Epoch200, '200')
-% WelchPower(session.SR, Epoch400, '400')
-% %WelchPower(session.SR, Epoch555, 'Stop');
+
+eventMI = 'Motor Imagery';
+eventBL = 'Baseline';
+
+figure
+for ch = 1:1:16
+    [pxxMI,fMI] = WelchPower(session.SR,epochMotorImagery,ch);
+    [pxxBL,fBL] = WelchPower(session.SR,epochBaseline, ch);
+    subplot(4,4,ch)
+    plot(fMI, 10*log10(mean(pxxMI,2)), '-r')
+    hold on
+    plot(fBL, 10*log10(mean(pxxBL,2)), '-b')
+    t = ['P(f) - Channel: ' num2str(ch)];
+    title(t)
+    axis([0 40 -50 20])
+    xlabel('frequency [Hz]')
+    ylabel('power [dB]')
+    legend(eventMI, eventBL)
+end
+    
 
 %% Spectrogram
-[f,t, pMiMeanOverTrials] = spectrogramPerChannel(session.SR, Epoch200, Epoch400);
-%[power400, powerAverage400] = spectrogramPerChannel(session.SR, Epoch400);
+
+[f,t, pMiMeanOverTrials] = spectrogramPerChannel(session.SR, epochBaseline, epochMotorImagery);
+%[power400, powerAverage400] = spectrogramPerChannel(session.SR, epochMotorImagery);
 %[power555, powerAverage555] = spectrogramPerChannel(session.SR, Epoch555);
 
 
 %% Topoplot
+
+addpath(genpath('eeglab_current')) % added path to topoplot function (can not be done before, because it shadows pwelch)
+
 % prepare data
-time = 1;
+time = 2;
 freqMin = 17;
 %freqMax = 30;
 idxF = find(f>=freqMin);
@@ -96,7 +116,7 @@ dataVector(:) = mean(topoplotData,1);
 figure()
 topoplot([],chanlocs16,'style','blank','electrodes','labelpoint','chaninfo',session.ChINFO);
 figure()
- topoplot(dataVector,chanlocs16);%,'style','blank','electrodes','labelpoint','chaninfo',session.ChINFO);
+topoplot(dataVector,chanlocs16);
 % figure()
 % topoplot(session.DATA_laplacien(:,100),chanlocs16);
 % figure()
