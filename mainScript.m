@@ -96,13 +96,12 @@ end
 %% Spectrogram
 
 [f,t, pMiMeanOverTrials] = spectrogramPerChannel(session.SR, epochBaseline, epochMotorImagery);
-%[power400, powerAverage400] = spectrogramPerChannel(session.SR, epochMotorImagery);
-%[power555, powerAverage555] = spectrogramPerChannel(session.SR, Epoch555);
+
 
 
 %% Topoplot
 
-addpath(genpath('eeglab_current')) % added path to topoplot function (can not be done before, because it shadows pwelch)
+addpath(genpath('eeglab13_4_4b')) % added path to topoplot function (can not be done before, because it shadows pwelch)
 
 % prepare data
 time = 2;
@@ -122,6 +121,7 @@ topoplot(dataVector,chanlocs16);
 % figure()
 % topoplot(session.DATA_CAR(:,100),chanlocs16);
 
+rmpath(genpath('eeglab13_4_4b')); % remove this path again
 
 
 
